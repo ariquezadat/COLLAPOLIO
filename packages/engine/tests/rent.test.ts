@@ -4,7 +4,7 @@ import { calcRent } from '../src/selectors.js';
 
 describe('rentas', () => {
   it('cobra la renta base al caer en propiedad ajena', () => {
-    // 6 = Av. Los Álamos (cielo, $100, base 6)
+    // 6 = El Mirador (cielo, $100, base 6)
     let s = newGame(['ana', 'beto']);
     s = giveTiles(s, 'beto', [6]);
     s = setPosition(s, 'ana', 0);

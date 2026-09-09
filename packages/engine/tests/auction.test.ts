@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { apply, expectFail, money, newGame, rollAndResolve, setMoney, tile, AT } from './helpers.js';
 import { reduce } from '../src/reducer.js';
 
-/** Deja el estado con una subasta abierta por la casilla 6 (Av. Los Álamos, $100) */
+/** Deja el estado con una subasta abierta por la casilla 6 (El Mirador, $100) */
 function auctionOpen(nicks = ['ana', 'beto', 'caro']) {
   let s = newGame(nicks);
   s = rollAndResolve(s, 2, 4); // 0 → 6, libre

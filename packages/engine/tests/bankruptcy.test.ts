@@ -5,7 +5,7 @@ import { reduce } from '../src/reducer.js';
 describe('deuda y quiebra', () => {
   it('abre una deuda cuando el efectivo no alcanza la renta', () => {
     let s = newGame(['ana', 'beto']);
-    s = giveTiles(s, 'beto', [39]); // Torre Cumbre
+    s = giveTiles(s, 'beto', [39]); // EUPHORIA, la casilla más cara
     const withHouse = structuredClone(s);
     withHouse.board[39].houses = 1; // renta 200
     s = setPosition(withHouse, 'ana', 35);

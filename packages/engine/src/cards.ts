@@ -22,10 +22,10 @@ export interface Card {
 
 export const CHANCE_CARDS: Card[] = [
   { id: 'ch_salida', effect: { kind: 'MOVE_TO', index: 0, collectGo: true } },
-  { id: 'ch_torre', effect: { kind: 'MOVE_TO', index: 39, collectGo: true } },
-  { id: 'ch_alfarero', effect: { kind: 'MOVE_TO', index: 11, collectGo: true } },
+  { id: 'ch_euphoria', effect: { kind: 'MOVE_TO', index: 39, collectGo: true } },
+  { id: 'ch_upb', effect: { kind: 'MOVE_TO', index: 11, collectGo: true } },
   { id: 'ch_terminal_norte', effect: { kind: 'MOVE_TO', index: 15, collectGo: true } },
-  { id: 'ch_marina', effect: { kind: 'MOVE_TO', index: 26, collectGo: true } },
+  { id: 'ch_sarcobamba', effect: { kind: 'MOVE_TO', index: 26, collectGo: true } },
   { id: 'ch_rail_cercano', effect: { kind: 'MOVE_NEAREST', target: 'RAIL', forcedRent: true } },
   { id: 'ch_servicio_cercano', effect: { kind: 'MOVE_NEAREST', target: 'UTILITY', forcedRent: true } },
   { id: 'ch_retroceder', effect: { kind: 'MOVE_REL', steps: -3 } },

@@ -1,0 +1,26 @@
+{
+  "name": "collapolio",
+  "private": true,
+  "version": "0.1.0",
+  "description": "CollaPolio \u2014 juego de mesa multijugador de econom\u00eda de propiedades en tiempo real",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace=@collapolio/server & npm run dev --workspace=@collapolio/web",
+    "dev:server": "npm run dev --workspace=@collapolio/server",
+    "dev:web": "npm run dev --workspace=@collapolio/web",
+    "test": "npm run test --workspace=@collapolio/engine",
+    "test:watch": "npm run test:watch --workspace=@collapolio/engine",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "build": "npm run build --workspace=@collapolio/web",
+    "test:engine": "npm run test --workspace=@collapolio/engine",
+    "build:web": "npm run build --workspace=@collapolio/web",
+    "start:server": "npm run start --workspace=@collapolio/server",
+    "deploy:web": "npm run build --workspace=@collapolio/web && ~/firebase-bin deploy --only hosting"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

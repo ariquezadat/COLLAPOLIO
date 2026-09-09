@@ -1,0 +1,19 @@
+# Blueprint de Render para el servidor de partidas de CollaPolio.
+# Al conectar el repo, Render lee este archivo y crea el servicio solo.
+services:
+  - type: web
+    name: collapolio-server
+    runtime: node
+    plan: free
+    region: oregon
+    # El servidor importa el motor desde el workspace: se instala el monorepo
+    buildCommand: npm install
+    startCommand: npm run start --workspace=@collapolio/server
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      # Dominio del hosting; se rellena tras desplegar la web en Firebase
+      - key: CORS_ORIGIN
+        sync: false

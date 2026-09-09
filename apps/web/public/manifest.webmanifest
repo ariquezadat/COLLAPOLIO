@@ -1,0 +1,18 @@
+{
+  "name": "CollaPolio",
+  "short_name": "CollaPolio",
+  "description": "Juego de mesa multijugador de economía de propiedades, en tiempo real y en el navegador.",
+  "start_url": "/es",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#070A11",
+  "theme_color": "#070A11",
+  "categories": ["games", "entertainment"],
+  "lang": "es",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

@@ -1,0 +1,33 @@
+# Despliegue del servidor de sockets en Fly.io
+app = "collapolio-server"
+primary_region = "scl"
+
+[build]
+  dockerfile = "apps/server/Dockerfile"
+
+[env]
+  PORT = "4000"
+
+[http_service]
+  internal_port = 4000
+  force_https = true
+  auto_stop_machines = "suspend"
+  auto_start_machines = true
+  # Al menos una máquina despierta: las salas viven en memoria/Redis
+  min_machines_running = 1
+
+  [http_service.concurrency]
+    type = "connections"
+    soft_limit = 400
+    hard_limit = 600
+
+[[http_service.checks]]
+  interval = "30s"
+  timeout = "4s"
+  grace_period = "10s"
+  method = "GET"
+  path = "/health"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512mb"

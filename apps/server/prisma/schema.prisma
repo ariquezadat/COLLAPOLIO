@@ -1,0 +1,77 @@
+// Persistencia opcional. El juego funciona sin base de datos: Postgres sólo
+// guarda perfiles registrados, historial de partidas y estadísticas.
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Profile {
+  id        String   @id @default(cuid())
+  /// Id anónimo que el cliente guarda en localStorage; permite reclamar
+  /// una cuenta más adelante sin perder el historial.
+  anonId    String   @unique
+  email     String?  @unique
+  nick      String
+  avatar    String   @default("zorro")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  results   GameResult[]
+  stats     Stats?
+
+  @@index([nick])
+}
+
+model Game {
+  id           String       @id @default(cuid())
+  roomCode     String
+  startedAt    DateTime
+  finishedAt   DateTime     @default(now())
+  /// Duración en segundos
+  durationSec  Int
+  playerCount  Int
+  botCount     Int
+  /// Ajustes con los que se jugó, tal cual
+  settings     Json
+  winnerAnonId String?
+
+  results      GameResult[]
+
+  @@index([roomCode])
+  @@index([finishedAt])
+}
+
+model GameResult {
+  id         String   @id @default(cuid())
+  game       Game     @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  gameId     String
+  profile    Profile? @relation(fields: [profileId], references: [id], onDelete: SetNull)
+  profileId  String?
+  anonId     String
+  nick       String
+  /// 1 = ganador
+  position   Int
+  netWorth   Int
+  bankrupt   Boolean  @default(false)
+  isBot      Boolean  @default(false)
+  properties Int      @default(0)
+
+  @@index([anonId])
+  @@unique([gameId, anonId])
+}
+
+model Stats {
+  id            String   @id @default(cuid())
+  profile       Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  profileId     String   @unique
+  gamesPlayed   Int      @default(0)
+  gamesWon      Int      @default(0)
+  bankruptcies  Int      @default(0)
+  bestNetWorth  Int      @default(0)
+  totalNetWorth BigInt   @default(0)
+  updatedAt     DateTime @updatedAt
+}

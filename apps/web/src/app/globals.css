@@ -1,0 +1,125 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * CollaPolio — sistema visual.
+ * Base oscura con tinte frío; superficies elevadas un paso más claras,
+ * bordes de 1px a baja opacidad y radios generosos.
+ */
+:root {
+  --c-ink: 7 10 17;
+  --c-surface: 15 20 34;
+  --c-raised: 22 29 47;
+  --c-line: 255 255 255;
+  --c-fg: 232 236 246;
+  --c-muted: 138 147 171;
+  --c-brand: 124 107 255;
+  --c-mint: 52 224 180;
+  --c-danger: 255 92 122;
+  --c-warn: 255 176 61;
+  color-scheme: dark;
+}
+
+* {
+  border-color: rgb(var(--c-line) / 0.07);
+}
+
+html,
+body {
+  background:
+    radial-gradient(1200px 700px at 15% -10%, rgb(124 107 255 / 0.12), transparent 60%),
+    radial-gradient(900px 600px at 95% 10%, rgb(52 224 180 / 0.08), transparent 55%),
+    rgb(var(--c-ink));
+  color: rgb(var(--c-fg));
+  min-height: 100%;
+}
+
+body {
+  font-family: var(--font-sans), ui-rounded, system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Todas las cifras con ancho fijo para que el dinero no baile */
+.num {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum' 1;
+}
+
+@layer components {
+  .surface {
+    @apply rounded-2xl border bg-surface/80 backdrop-blur-sm;
+    border-color: rgb(var(--c-line) / 0.07);
+  }
+  .surface-raised {
+    @apply rounded-2xl border bg-raised;
+    border-color: rgb(var(--c-line) / 0.09);
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold
+           transition-transform duration-150 will-change-transform disabled:cursor-not-allowed
+           disabled:opacity-40 disabled:hover:scale-100;
+  }
+  .btn:hover:not(:disabled) {
+    transform: scale(1.02);
+  }
+  .btn:active:not(:disabled) {
+    transform: scale(0.98);
+  }
+  .btn-primary {
+    @apply btn text-ink;
+    background: linear-gradient(180deg, rgb(var(--c-brand)), rgb(104 88 235));
+    box-shadow: 0 10px 30px -12px rgb(var(--c-brand) / 0.8);
+    color: #fff;
+  }
+  .btn-mint {
+    @apply btn;
+    background: linear-gradient(180deg, rgb(var(--c-mint)), rgb(32 190 150));
+    color: rgb(var(--c-ink));
+    box-shadow: 0 10px 30px -12px rgb(var(--c-mint) / 0.7);
+  }
+  .btn-ghost {
+    @apply btn border bg-raised/70 text-fg;
+    border-color: rgb(var(--c-line) / 0.1);
+  }
+  .btn-danger {
+    @apply btn;
+    background: linear-gradient(180deg, rgb(var(--c-danger)), rgb(220 62 92));
+    color: #fff;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium;
+    border-color: rgb(var(--c-line) / 0.1);
+    background: rgb(var(--c-raised) / 0.7);
+  }
+  .field {
+    @apply w-full rounded-xl border bg-ink/60 px-3 py-2.5 text-sm outline-none transition;
+    border-color: rgb(var(--c-line) / 0.1);
+  }
+  .field:focus {
+    border-color: rgb(var(--c-brand) / 0.6);
+    box-shadow: 0 0 0 3px rgb(var(--c-brand) / 0.15);
+  }
+}
+
+/* Scrollbars discretas */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: rgb(var(--c-line) / 0.1);
+  border-radius: 999px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}

@@ -4,5 +4,5 @@
  * hosting — sin recompilar la web.
  */
 window.__COLLAPOLIO_CONFIG__ = {
-  serverUrl: 'http://localhost:4000',
+  serverUrl: 'https://collapolio-server.onrender.com',
 };

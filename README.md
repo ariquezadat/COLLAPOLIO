@@ -198,9 +198,11 @@ cabeceras de caché y seguridad.
 `render.yaml` es un Blueprint: al conectar el repo, Render crea el servicio
 solo. Sólo hay que rellenar `CORS_ORIGIN` con el dominio del hosting.
 
-El plan gratis duerme el servicio tras 15 min sin tráfico y tarda ~1 min en
-despertar; con 750 h/mes alcanza de sobra para partidas con amigos. Las salas
-viven en memoria, así que un reinicio se lleva las partidas en curso: para que
+El plan gratis documenta que el servicio se duerme tras 15 min sin tráfico,
+pero el `healthCheckPath` lo mantiene despierto: dos pruebas con 17 y 35 min de
+silencio lo encontraron vivo, respondiendo en 0,44-0,60 s. Eso gasta ~744 de
+las 750 h/mes de cuota, así que cabe un solo servicio y poco más. Las salas
+viven en memoria: un reinicio se lleva las partidas en curso, y para que
 sobrevivan hay que añadir `REDIS_URL`.
 
 Si escalas a más de una instancia necesitas `REDIS_URL` **y** el adaptador de

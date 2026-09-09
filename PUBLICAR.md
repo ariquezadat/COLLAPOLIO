@@ -55,15 +55,20 @@ Render (servicio → Environment), o el navegador bloqueará las conexiones.
 
 ## Lo que hay que saber del plan gratis de Render
 
-- **Arranque en frío**: tras 15 minutos sin tráfico el servicio se duerme. El
-  primer intento tarda ~1 minuto y la web muestra "El servidor de partidas no
-  responde. Puede estar despertando: reintenta en un minuto." Avisa a tus
-  amigos: el primero que entre paga la espera, el resto ya lo encuentra
-  despierto.
-- **Las salas viven en memoria**: si el servidor se reinicia o se duerme a
-  mitad de partida, esa partida se pierde. Para evitarlo hay que crear un Redis
-  en Render (gratis, 25 MB) y poner `REDIS_URL` en el servicio.
-- **750 horas al mes**: sobra, porque sólo cuenta el tiempo despierto.
+- **No se duerme, medido.** Render documenta que un servicio gratis se apaga
+  tras 15 minutos sin tráfico, pero `render.yaml` define
+  `healthCheckPath: /health` y Render consulta ese endpoint por su cuenta, lo
+  que cuenta como actividad. Dos pruebas con silencio total (17 y 35 minutos)
+  encontraron el proceso vivo, con 54 minutos seguidos de uptime, respondiendo
+  en 0,44-0,60 s. Si alguna vez quitas el health check, volverá a dormirse.
+- **Cuidado con la cuota**: 750 horas de instancia al mes. Estar siempre
+  encendido gasta ~744 h en un mes de 31 días, así que cabe pero con poco
+  margen. Si añades un segundo servicio gratis, te pasas y Render los suspende
+  hasta el mes siguiente.
+- **Latencia en partida**: ~180 ms desde Sudamérica (región Virginia).
+- **Las salas viven en memoria**: si el servidor se reinicia (por ejemplo al
+  desplegar), las partidas en curso se pierden. Para evitarlo hay que crear un
+  Redis en Render (gratis, 25 MB) y poner `REDIS_URL` en el servicio.
 - **Una sola instancia**: correcto tal como está el juego. Escalar a varias
   requiere Redis *y* el adaptador de Socket.IO para Redis.
 

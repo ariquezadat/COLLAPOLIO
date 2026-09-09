@@ -137,7 +137,7 @@ export const es = {
     pollos_pampeno: 'Pollos Pampeño', lolo_chicken: 'Lolo Chicken',
     el_mirador: 'El Mirador', la_pepsi_de_sacaba: 'La Pepsi de Sacaba', la_casona: 'La Casona',
     upb: 'UPB', univalle: 'UNIVALLE', ucb: 'UCB',
-    buger_king: 'Buger King', estadio_felix_capriles: 'Estadio Felix Capriles', kebab_villaroel: 'Kebab de la Villaroel',
+    burger_king: 'Burger King', estadio_felix_capriles: 'Estadio Félix Capriles', kebab_villarroel: 'Kebab de la Villarroel',
     tiquipaya: 'Tiquipaya', pretty_woman: 'Pretty Woman', country_club: 'Country Club Cochabamba',
     sarcobamba: 'Sarcobamba', fidel_anze: 'Fidel Anze', parque_lincoln: 'Parque Lincoln',
     bosque_norte: 'Bosque Norte', bosque_sur: 'Bosque Sur', lomas_de_aranjuez: 'Las Lomas de Aranjuez',

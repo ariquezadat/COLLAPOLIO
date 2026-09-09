@@ -14,11 +14,18 @@ declare global {
  * recompilar la web. La variable de entorno queda como respaldo en desarrollo.
  */
 export function serverUrl(): string {
+  const porEntorno = process.env.NEXT_PUBLIC_SERVER_URL;
   if (typeof window !== 'undefined') {
-    const fromConfig = window.__COLLAPOLIO_CONFIG__?.serverUrl;
-    if (fromConfig) return fromConfig;
+    // En local siempre se habla con el servidor local: `config.js` lleva la
+    // URL de producción, cuyo CORS no acepta localhost.
+    const { hostname } = window.location;
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+      return porEntorno ?? 'http://localhost:4000';
+    }
+    const deConfig = window.__COLLAPOLIO_CONFIG__?.serverUrl;
+    if (deConfig) return deConfig;
   }
-  return process.env.NEXT_PUBLIC_SERVER_URL ?? 'http://localhost:4000';
+  return porEntorno ?? 'http://localhost:4000';
 }
 
 let socket: Socket | null = null;

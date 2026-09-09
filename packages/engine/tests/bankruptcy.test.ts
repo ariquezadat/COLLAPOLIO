@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { apply, giveTiles, money, newGame, rollAndResolve, setMoney, setPosition, tile, AT } from './helpers.js';
+import { apply, expectFail, giveTiles, money, newGame, rollAndResolve, setMoney, setPosition, tile, AT } from './helpers.js';
 import { reduce } from '../src/reducer.js';
 
 describe('deuda y quiebra', () => {
@@ -103,5 +103,61 @@ describe('deuda y quiebra', () => {
     s = rollAndResolve(s, 1, 1); // impuesto $200
     expect(s.phase).toBe('GAME_OVER');
     expect(s.winnerId).toBe('beto');
+  });
+});
+
+describe('rendirse (bancarrota voluntaria)', () => {
+  it('se puede abandonar sin tener deuda y los activos vuelven al banco', () => {
+    let s = newGame(['ana', 'beto', 'caro']);
+    s = giveTiles(s, 'ana', [6, 8]);
+    s = apply(s, { type: 'DECLARE_BANKRUPTCY', playerId: 'ana', at: AT });
+    const ana = s.players.find((p) => p.id === 'ana')!;
+    expect(ana.bankrupt).toBe(true);
+    expect(ana.money).toBe(0);
+    expect(tile(s, 6).ownerId).toBeNull();
+    expect(tile(s, 8).ownerId).toBeNull();
+    expect(s.phase).not.toBe('GAME_OVER');
+  });
+
+  it('rendirse fuera de turno no rompe el turno de otro', () => {
+    let s = newGame(['ana', 'beto', 'caro']);
+    expect(s.order[s.turnIndex]).toBe('ana');
+    s = apply(s, { type: 'DECLARE_BANKRUPTCY', playerId: 'beto', at: AT });
+    expect(s.players.find((p) => p.id === 'beto')!.bankrupt).toBe(true);
+    expect(s.order[s.turnIndex]).toBe('ana');
+    expect(s.phase).toBe('ROLLING');
+  });
+
+  it('si se rinde el jugador en turno, pasa al siguiente', () => {
+    let s = newGame(['ana', 'beto', 'caro']);
+    s = apply(s, { type: 'DECLARE_BANKRUPTCY', playerId: 'ana', at: AT });
+    expect(s.order[s.turnIndex]).toBe('beto');
+    expect(s.phase).toBe('ROLLING');
+  });
+
+  it('rendirse deja la partida con un ganador si sólo queda uno', () => {
+    let s = newGame(['ana', 'beto']);
+    s = apply(s, { type: 'DECLARE_BANKRUPTCY', playerId: 'ana', at: AT });
+    expect(s.phase).toBe('GAME_OVER');
+    expect(s.winnerId).toBe('beto');
+  });
+
+  it('rendirse durante una subasta no la deja colgada', () => {
+    let s = newGame(['ana', 'beto', 'caro']);
+    s = rollAndResolve(s, 2, 4); // 0 → 6, libre
+    s = apply(s, { type: 'DECLINE_PURCHASE', playerId: 'ana', at: AT });
+    expect(s.phase).toBe('AUCTION');
+    s = apply(s, { type: 'BID', playerId: 'beto', amount: 50, at: AT });
+    s = apply(s, { type: 'PASS_BID', playerId: 'caro', at: AT });
+    // Queda ana pujando; si se rinde, gana beto y la subasta se cierra
+    s = apply(s, { type: 'DECLARE_BANKRUPTCY', playerId: 'ana', at: AT });
+    expect(s.auction).toBeNull();
+    expect(tile(s, 6).ownerId).toBe('beto');
+  });
+
+  it('no se puede abandonar dos veces', () => {
+    let s = newGame(['ana', 'beto', 'caro']);
+    s = apply(s, { type: 'DECLARE_BANKRUPTCY', playerId: 'ana', at: AT });
+    expect(expectFail(s, { type: 'DECLARE_BANKRUPTCY', playerId: 'ana', at: AT })).toBe('no_player');
   });
 });

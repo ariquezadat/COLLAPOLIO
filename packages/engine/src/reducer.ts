@@ -480,6 +480,23 @@ function goBankrupt(ctx: Ctx, debtorId: string, creditorId: string | null) {
   }
   ctx.events.push({ type: 'player_bankrupt', playerId: debtorId, creditorId });
   log(ctx, 'log.bankrupt', { creditor: creditor?.nick ?? 'banco' }, debtorId);
+
+  // Si estaba pujando, sale de la subasta; si no queda nadie, se resuelve ya
+  const a = ctx.s.auction;
+  if (a && a.activeBidders.includes(debtorId)) {
+    a.activeBidders = a.activeBidders.filter((id) => id !== debtorId);
+    if (a.highestBidderId === debtorId) {
+      a.highestBidderId = null;
+      a.highestBid = 0;
+    }
+    const soloQuedaElGanador =
+      a.activeBidders.length === 1 && a.activeBidders[0] === a.highestBidderId;
+    if (a.activeBidders.length === 0 || soloQuedaElGanador) {
+      resolveAuction(ctx, Date.now());
+      return;
+    }
+  }
+
   checkGameOver(ctx);
 }
 
@@ -1010,14 +1027,18 @@ export function reduce(state: GameState, action: Action): ReduceResult {
     case 'DECLARE_BANKRUPTCY': {
       const p = getPlayer(s, action.playerId);
       if (!p || p.bankrupt) return fail(state, 'no_player');
+      if (s.phase === 'LOBBY' || s.phase === 'GAME_OVER') return fail(state, 'wrong_phase');
+      // Rendirse es válido en cualquier momento: si no hay deuda, los activos
+      // vuelven al banco en vez de pasar a un acreedor.
       const d = s.debt;
-      if (!d || d.debtorId !== action.playerId) return fail(state, 'no_debt');
-      goBankrupt(ctx, action.playerId, d.creditorId);
-      if (s.phase !== 'GAME_OVER' && s.order[s.turnIndex] === action.playerId) {
-        advanceTurn(ctx, at);
-      } else if (s.phase !== 'GAME_OVER') {
-        s.phase = 'TURN_END';
-      }
+      const creditorId = d && d.debtorId === action.playerId ? d.creditorId : null;
+      goBankrupt(ctx, action.playerId, creditorId);
+      // `goBankrupt` puede terminar la partida; se relee la fase por `ctx`
+      // porque TypeScript no ve esa mutación a través de `s`.
+      if (ctx.s.phase === 'GAME_OVER') return { state: s, events: ctx.events };
+      // Sólo se toca el turno si quien abandona era el jugador en turno;
+      // rendirse desde la banca no debe interrumpir a quien está jugando.
+      if (s.order[s.turnIndex] === action.playerId) advanceTurn(ctx, at);
       return { state: s, events: ctx.events };
     }
 
@@ -1215,8 +1236,10 @@ export function legalActions(state: GameState, playerId: string): string[] {
     out.push('bid', 'pass_bid');
   }
   if (state.debt?.debtorId === playerId) {
-    out.push('declare_bankruptcy', 'mortgage', 'sell_house');
+    out.push('mortgage', 'sell_house');
   }
+  // Rendirse siempre es posible mientras la partida siga en curso
+  if (state.phase !== 'GAME_OVER') out.push('declare_bankruptcy');
   if (isTurn) {
     if (state.phase === 'ROLLING') {
       out.push('roll_dice');

@@ -11,7 +11,8 @@ import { NickGate } from '../NickGate';
 import { Logo } from '../Iso';
 import { Board } from '../board/Board';
 import { Lobby } from './Lobby';
-import { PlayerCard } from './PlayerCard';
+import { RightPanel } from './RightPanel';
+import { ShareBox } from './ShareBox';
 import { SidePanel } from './SidePanel';
 import { ActionBar } from './ActionBar';
 import { PurchaseModal } from './PurchaseModal';
@@ -135,33 +136,28 @@ export function RoomScreen({ code, locale }: { code: string; locale: string }) {
     );
   }
 
-  const currentId = state.order[state.turnIndex];
+  const abrirTrade = (partnerId: string | null) => {
+    setTradePartner(partnerId);
+    setCounterOf(null);
+    setTradeOpen(true);
+  };
 
-  const playersColumn = (
-    <div className="space-y-2.5">
-      {state.order.map((id) => {
-        const p = state.players.find((x) => x.id === id);
-        if (!p) return null;
-        return (
-          <PlayerCard
-            key={p.id}
-            player={p}
-            state={state}
-            isTurn={p.id === currentId}
-            isYou={p.id === you}
-            skew={clockSkew}
-            onTrade={
-              p.id !== you && you
-                ? () => {
-                    setTradePartner(p.id);
-                    setCounterOf(null);
-                    setTradeOpen(true);
-                  }
-                : undefined
-            }
-          />
-        );
-      })}
+  const panelDerecho = (
+    <RightPanel
+      state={state}
+      you={you}
+      skew={clockSkew}
+      onManage={() => setManageOpen(true)}
+      onTradeWith={abrirTrade}
+      onRespondTrade={(tradeId, accept) => act('respond_trade', { tradeId, accept })}
+      onBankrupt={() => act('declare_bankruptcy')}
+    />
+  );
+
+  const panelIzquierdo = (
+    <div className="flex min-h-0 flex-col gap-3">
+      <ShareBox code={code} />
+      <SidePanel state={state} chat={chat} onSend={(text) => act('chat_message', { text })} />
     </div>
   );
 
@@ -169,15 +165,15 @@ export function RoomScreen({ code, locale }: { code: string; locale: string }) {
     <main className="flex h-dvh flex-col overflow-hidden">
       {header}
 
-      <div className="grid min-h-0 flex-1 gap-3 px-3 pb-3 lg:grid-cols-[minmax(220px,260px)_minmax(0,1fr)_minmax(240px,300px)]">
-        {/* Izquierda: jugadores */}
-        <aside className="hidden min-h-0 overflow-y-auto lg:block">{playersColumn}</aside>
+      <div className="grid min-h-0 flex-1 gap-3 px-3 pb-3 lg:grid-cols-[minmax(230px,280px)_minmax(0,1fr)_minmax(250px,310px)]">
+        {/* Izquierda: invitación y chat */}
+        <aside className="hidden min-h-0 lg:flex lg:flex-col">{panelIzquierdo}</aside>
 
         {/* Centro: tablero + barra de acciones */}
         <section className="flex min-h-0 flex-col items-center gap-3">
           <div className="flex min-h-0 w-full flex-1 items-center justify-center">
             <div className="w-full max-w-[min(100%,calc(100dvh-190px))]">
-              <Board state={state} renderPos={renderPos} dice={dice} />
+              <Board state={state} renderPos={renderPos} dice={dice} skew={clockSkew} />
             </div>
           </div>
           <div className="w-full max-w-2xl">
@@ -187,19 +183,13 @@ export function RoomScreen({ code, locale }: { code: string; locale: string }) {
               legal={legal}
               onAction={act}
               onManage={() => setManageOpen(true)}
-              onTrade={() => {
-                setTradePartner(null);
-                setCounterOf(null);
-                setTradeOpen(true);
-              }}
+              onTrade={() => abrirTrade(null)}
             />
           </div>
         </section>
 
-        {/* Derecha: registro y chat */}
-        <aside className="hidden min-h-0 flex-col lg:flex">
-          <SidePanel state={state} chat={chat} onSend={(text) => act('chat_message', { text })} />
-        </aside>
+        {/* Derecha: jugadores, bancarrota, intercambios y propiedades */}
+        <aside className="hidden min-h-0 overflow-y-auto lg:block">{panelDerecho}</aside>
       </div>
 
       {/* Móvil: hojas inferiores */}
@@ -217,13 +207,18 @@ export function RoomScreen({ code, locale }: { code: string; locale: string }) {
           className="fixed inset-0 z-30 flex items-end bg-ink/70 backdrop-blur-sm lg:hidden"
           onClick={(e) => e.target === e.currentTarget && setSheet(null)}
         >
-          <div className="surface-raised max-h-[75dvh] w-full overflow-y-auto rounded-b-none p-4">
+          <div className="surface-raised max-h-[80dvh] w-full overflow-y-auto rounded-b-none p-4">
             <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-line/20" />
             {sheet === 'players' ? (
-              playersColumn
+              panelDerecho
             ) : (
-              <div className="flex h-[55dvh] flex-col">
-                <SidePanel state={state} chat={chat} onSend={(text) => act('chat_message', { text })} />
+              <div className="flex h-[60dvh] flex-col gap-3">
+                <ShareBox code={code} />
+                <SidePanel
+                  state={state}
+                  chat={chat}
+                  onSend={(text) => act('chat_message', { text })}
+                />
               </div>
             )}
           </div>

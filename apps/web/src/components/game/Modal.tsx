@@ -37,7 +37,7 @@ export function Modal({
             role="dialog"
             aria-modal="true"
             aria-label={title}
-            className={`surface-raised max-h-[88dvh] w-full overflow-y-auto p-5 shadow-lift ${
+            className={`surface-raised relative max-h-[88dvh] w-full overflow-y-auto p-5 shadow-lift ${
               wide ? 'max-w-3xl' : 'max-w-md'
             }`}
             initial={{ opacity: 0, y: 24, scale: 0.96 }}
@@ -45,7 +45,19 @@ export function Modal({
             exit={{ opacity: 0, y: 12, scale: 0.97 }}
             transition={{ type: 'spring', stiffness: 420, damping: 32 }}
           >
-            {title && <h2 className="mb-4 text-lg font-bold">{title}</h2>}
+            {onClose && (
+              <button
+                type="button"
+                aria-label="cerrar"
+                onClick={onClose}
+                className="absolute right-3 top-3 grid h-8 w-8 place-items-center rounded-full text-muted transition hover:bg-line/10 hover:text-fg"
+              >
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+                  <path d="M18 6 6 18M6 6l12 12" />
+                </svg>
+              </button>
+            )}
+            {title && <h2 className="mb-4 pr-8 text-lg font-bold">{title}</h2>}
             {children}
           </motion.div>
         </motion.div>

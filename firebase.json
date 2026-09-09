@@ -23,6 +23,15 @@
         "headers": [{ "key": "Cache-Control", "value": "no-cache, max-age=0" }]
       },
       {
+        "//": "El HTML no se cachea: si no, tras cada despliegue los visitantes recurrentes se quedan con la versión vieja hasta una hora. Con cleanUrls la ruta pedida no lleva extensión, así que hay que enumerarlas. Los chunks JS sí se cachean, porque llevan hash en el nombre.",
+        "source": "/@(es|en)",
+        "headers": [{ "key": "Cache-Control", "value": "no-cache, max-age=0" }]
+      },
+      {
+        "source": "/@(es|en)/@(salas|sala|info|blog|terminos|privacidad|cookies)",
+        "headers": [{ "key": "Cache-Control", "value": "no-cache, max-age=0" }]
+      },
+      {
         "source": "/sw.js",
         "headers": [{ "key": "Cache-Control", "value": "no-cache, max-age=0" }]
       },

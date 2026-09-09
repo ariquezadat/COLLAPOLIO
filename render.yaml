@@ -5,7 +5,8 @@ services:
     name: collapolio-server
     runtime: node
     plan: free
-    region: oregon
+    # US-East es la región de Render con menos latencia hacia Sudamérica
+    region: virginia
     # El servidor importa el motor desde el workspace: se instala el monorepo
     buildCommand: npm install
     startCommand: npm run start --workspace=@collapolio/server
